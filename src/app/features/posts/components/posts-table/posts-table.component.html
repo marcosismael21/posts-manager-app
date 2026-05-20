@@ -1,0 +1,65 @@
+<div class="flex-1 min-h-0 bg-white border border-slate-200 rounded-sm overflow-hidden">
+  <p-table
+    [value]="posts()"
+    [lazy]="true"
+    (onLazyLoad)="lazyLoad.emit($event)"
+    [loading]="loading()"
+    [paginator]="true"
+    [rows]="pageSize()"
+    [totalRecords]="totalRecords()"
+    [rowsPerPageOptions]="[5, 10, 20]"
+    [scrollable]="true"
+    scrollHeight="flex"
+    styleClass="p-datatable-sm"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="text-left">Título</th>
+        <th class="text-left">Autor</th>
+        <th class="text-left">Imágenes</th>
+        <th class="text-left">Fecha</th>
+        <th class="text-left">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-post>
+      <tr class="hover:bg-slate-50 transition-colors">
+        <td class="font-medium text-slate-800 max-w-xs truncate">{{ post.title }}</td>
+        <td class="text-slate-600">{{ post.author }}</td>
+        <td>
+          @if (post.imageUrls?.length) {
+            <p-tag [value]="post.imageUrls.length + ' img'" severity="secondary" />
+          } @else {
+            <span class="text-slate-400 text-sm">—</span>
+          }
+        </td>
+        <td class="text-slate-500 text-sm">{{ post.createdAt }}</td>
+        <td>
+          <div class="flex items-center gap-1">
+            <p-button icon="pi pi-eye" size="small" severity="secondary" [text]="true" (onClick)="viewPost.emit(post._id)" pTooltip="Ver" />
+            @if (showEditDelete()) {
+              <p-button icon="pi pi-pencil" size="small" severity="secondary" [text]="true" (onClick)="editPost.emit(post._id)" pTooltip="Editar" />
+              <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true" (onClick)="deletePost.emit(post._id)" pTooltip="Eliminar" />
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5">
+          <app-empty-state message="No hay posts aún" />
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="loadingbody">
+      @for (i of [1, 2, 3, 4, 5]; track i) {
+        <tr>
+          <td colspan="5" class="text-center text-slate-400 py-4">Cargando...</td>
+        </tr>
+      }
+    </ng-template>
+  </p-table>
+</div>
