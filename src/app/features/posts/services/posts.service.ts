@@ -10,10 +10,11 @@ export class PostsService {
   private readonly http = inject(HttpClient);
   private readonly BASE = `${environment.apiUrl}/posts`;
 
-  getAll(params?: { page?: number; limit?: number }): Observable<PaginatedData<Post>> {
+  getAll(params?: { page?: number; limit?: number; search?: string }): Observable<PaginatedData<Post>> {
     let httpParams = new HttpParams();
     if (params?.page) httpParams = httpParams.set('page', params.page.toString());
     if (params?.limit) httpParams = httpParams.set('limit', params.limit.toString());
+    if (params?.search) httpParams = httpParams.set('search', params.search);
 
     return this.http.get<ApiPaginatedResponse<Post>>(this.BASE, { params: httpParams }).pipe(
       map((res) => res.data!),
@@ -21,11 +22,12 @@ export class PostsService {
     );
   }
 
-  getMyPosts(userId: string, page: number, limit: number): Observable<PaginatedData<Post>> {
-    const params = new HttpParams()
+  getMyPosts(userId: string, page: number, limit: number, search?: string): Observable<PaginatedData<Post>> {
+    let params = new HttpParams()
       .set('userId', userId)
       .set('page', page.toString())
       .set('limit', limit.toString());
+    if (search) params = params.set('search', search);
 
     return this.http.get<ApiPaginatedResponse<Post>>(this.BASE, { params }).pipe(
       map((res) => res.data!),
