@@ -1,12 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ToastComponent } from './shared/components/toast/toast.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  imports: [RouterOutlet, ToastComponent],
+  template: `<app-toast /><router-outlet />`,
 })
-export class App {
-  protected readonly title = signal('posts-manager-app');
-}
+export class App {}
