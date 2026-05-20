@@ -7,7 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { delay, finalize, of, switchMap, tap } from 'rxjs';
+import { catchError, delay, finalize, of, switchMap, tap } from 'rxjs';
 import { InputText } from 'primeng/inputtext';
 import { EditorModule } from 'primeng/editor';
 import { Button } from 'primeng/button';
@@ -64,7 +64,10 @@ export class PostFormComponent implements OnInit {
           this.isEditMode.set(true);
           this.postId.set(id);
           this.loading.set(true);
-          return this.postsService.getOne(id);
+          return this.postsService.getOne(id).pipe(
+            finalize(() => this.loading.set(false)),
+            catchError(() => of(null)),
+          );
         }),
         tap((post) => {
           if (post) {
@@ -72,7 +75,6 @@ export class PostFormComponent implements OnInit {
             this.keepUrls.set([...post.imageUrls]);
           }
         }),
-        finalize(() => this.loading.set(false)),
       )
       .subscribe();
   }
@@ -130,6 +132,11 @@ export class PostFormComponent implements OnInit {
         ),
         delay(1500),
         tap(() => this.router.navigate(['/posts'])),
+        catchError((err) => {
+          const detail = err?.error?.message ?? 'Ocurrió un error al guardar el post';
+          this.messageService.add({ severity: 'error', summary: 'Error', detail, life: 5000 });
+          return of(null);
+        }),
         finalize(() => this.saving.set(false)),
       )
       .subscribe();
