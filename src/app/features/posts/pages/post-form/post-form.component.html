@@ -1,0 +1,140 @@
+<div class="flex flex-col flex-1 min-h-0 overflow-auto p-6">
+
+  <div class="flex items-center gap-3 mb-4">
+    <p-button icon="pi pi-arrow-left" severity="secondary" [text]="true" size="small" (onClick)="cancel()" />
+    <h1 class="text-xl font-semibold text-slate-800">
+      {{ isEditMode() ? 'Editar post' : 'Nuevo post' }}
+    </h1>
+  </div>
+
+  @if (loading()) {
+    <div class="text-slate-400 text-sm">Cargando...</div>
+  } @else {
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+
+      <div class="flex gap-6">
+
+        <div class="flex-1 min-w-0 flex flex-col gap-4 bg-white border border-slate-200 rounded-sm p-5">
+
+          <div class="flex flex-col gap-1.5">
+            <label for="title" class="text-sm font-medium text-slate-700">
+              Título <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="title"
+              type="text"
+              pInputText
+              formControlName="title"
+              placeholder="Título del post"
+              class="w-full"
+            />
+            @if (form.get('title')?.invalid && form.get('title')?.touched) {
+              <span class="text-xs text-red-500">El título debe tener al menos 3 caracteres</span>
+            }
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-sm font-medium text-slate-700">
+              Contenido <span class="text-red-500">*</span>
+            </label>
+            <p-editor
+              formControlName="body"
+              [style]="{ height: '260px' }"
+              placeholder="Escribe el contenido del post..."
+            />
+            @if (form.get('body')?.invalid && form.get('body')?.touched) {
+              <span class="text-xs text-red-500">El contenido debe tener al menos 10 caracteres</span>
+            }
+          </div>
+
+        </div>
+
+        <div class="flex-1 flex flex-col gap-3 bg-white border border-slate-200 rounded-sm p-4">
+
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-slate-700">Imágenes</span>
+            <span class="text-xs text-slate-400">{{ keepUrls().length + pendingFiles().length }}/10</span>
+          </div>
+
+          @if (isEditMode() && keepUrls().length) {
+            <div class="flex flex-wrap gap-2">
+              @for (url of keepUrls(); track url) {
+                <div class="relative">
+                  <img [src]="url" alt="Imagen" class="h-20 w-20 object-cover rounded border border-slate-200" />
+                  <button
+                    type="button"
+                    (click)="removeExistingImage(url)"
+                    class="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center transition-colors"
+                  >
+                    <i class="pi pi-times" style="font-size: 0.55rem"></i>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
+          @if (previewUrls().length) {
+            <div class="flex flex-wrap gap-2">
+              @for (url of previewUrls(); track url; let i = $index) {
+                <div class="relative">
+                  <img [src]="url" alt="Nueva imagen" class="h-20 w-20 object-cover rounded border border-slate-200" />
+                  <button
+                    type="button"
+                    (click)="removeNewFile(i)"
+                    class="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center transition-colors"
+                  >
+                    <i class="pi pi-times" style="font-size: 0.55rem"></i>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
+          @if (remainingSlots > 0) {
+            <label
+              for="imageInput"
+              class="cursor-pointer flex flex-col items-center justify-center gap-1.5 py-5 text-sm border-2 border-dashed border-slate-200 text-slate-400 rounded hover:bg-slate-50 hover:border-slate-300 hover:text-slate-500 transition-colors"
+            >
+              <i class="pi pi-cloud-upload text-2xl"></i>
+              <span>Agregar imágenes</span>
+              <span class="text-xs">o arrastra aquí</span>
+            </label>
+            <input
+              id="imageInput"
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/svg+xml"
+              multiple
+              class="hidden"
+              (change)="onFilesSelected($event)"
+            />
+          }
+
+          <p class="text-xs text-slate-400 mt-auto">
+            Máx. 10 imágenes · 6 MB por archivo · JPG, PNG, GIF, WebP, SVG
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+        <p-button
+          type="button"
+          label="Cancelar"
+          severity="secondary"
+          (onClick)="cancel()"
+        />
+        <p-button
+          type="submit"
+          [label]="isEditMode() ? 'Guardar cambios' : 'Crear post'"
+          [loading]="saving()"
+          [disabled]="form.invalid"
+        />
+      </div>
+
+    </form>
+
+  }
+
+</div>
