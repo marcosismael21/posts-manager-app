@@ -7,12 +7,13 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize, of, switchMap, tap } from 'rxjs';
+import { delay, finalize, of, switchMap, tap } from 'rxjs';
 import { InputText } from 'primeng/inputtext';
 import { EditorModule } from 'primeng/editor';
 import { Button } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { PostsService } from '../../services/posts.service';
+import { AutoFocusDirective } from '../../../../shared/directives/auto-focus.directive';
 
 function bodyValidator(min: number): ValidatorFn {
   return (control: AbstractControl) => {
@@ -28,7 +29,7 @@ function bodyValidator(min: number): ValidatorFn {
   selector: 'app-post-form',
   standalone: true,
   host: { class: 'flex flex-col flex-1 min-h-0' },
-  imports: [ReactiveFormsModule, InputText, EditorModule, Button],
+  imports: [ReactiveFormsModule, InputText, EditorModule, Button, AutoFocusDirective],
   templateUrl: './post-form.component.html',
 })
 export class PostFormComponent implements OnInit {
@@ -119,15 +120,16 @@ export class PostFormComponent implements OnInit {
 
     save$
       .pipe(
-        tap(() => {
+        tap(() =>
           this.messageService.add({
             severity: 'success',
             summary: this.isEditMode() ? 'Actualizado' : 'Creado',
             detail: `Post ${this.isEditMode() ? 'actualizado' : 'creado'} correctamente`,
             life: 3000,
-          });
-          this.router.navigate(['/posts']);
-        }),
+          }),
+        ),
+        delay(1500),
+        tap(() => this.router.navigate(['/posts'])),
         finalize(() => this.saving.set(false)),
       )
       .subscribe();

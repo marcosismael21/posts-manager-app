@@ -53,6 +53,8 @@ export class PostsListComponent implements OnInit, OnDestroy {
   searchQuery = signal('');
   bulkLoading = signal(false);
 
+  private lastLazyEvent?: TableLazyLoadEvent;
+
   filteredPosts = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
     if (!q) return this.posts();
@@ -72,6 +74,15 @@ export class PostsListComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
       )
       .subscribe();
+
+    this.postsService
+      .streamChanges()
+      .pipe(
+        tap(() => this.loadPosts()),
+        takeUntil(this.destroy$),
+        catchError(() => of(null)),
+      )
+      .subscribe();
   }
 
   ngOnDestroy(): void {
@@ -80,8 +91,9 @@ export class PostsListComponent implements OnInit, OnDestroy {
   }
 
   loadPosts(event?: TableLazyLoadEvent): void {
-    const first = event?.first ?? 0;
-    const rows = event?.rows ?? this.pageSize;
+    if (event) this.lastLazyEvent = event;
+    const first = this.lastLazyEvent?.first ?? 0;
+    const rows = this.lastLazyEvent?.rows ?? this.pageSize;
     const page = Math.floor(first / rows) + 1;
 
     this.loading.set(true);

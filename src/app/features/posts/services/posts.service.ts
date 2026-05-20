@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { catchError, map, tap, throwError } from 'rxjs';
-import type { Observable } from 'rxjs';
+import { catchError, map, throwError, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { ApiPaginatedResponse, ApiResponse, PaginatedData } from '../../../core/models/api-response.model';
 import { CreatePostDto, Post, UpdatePostDto } from '../../../core/models/post.model';
@@ -17,7 +16,6 @@ export class PostsService {
     if (params?.limit) httpParams = httpParams.set('limit', params.limit.toString());
 
     return this.http.get<ApiPaginatedResponse<Post>>(this.BASE, { params: httpParams }).pipe(
-      tap(() => console.log('[PostsService] getAll')),
       map((res) => res.data!),
       catchError((err) => throwError(() => err)),
     );
@@ -68,5 +66,14 @@ export class PostsService {
       map((res) => res.data ?? []),
       catchError((err) => throwError(() => err)),
     );
+  }
+
+  streamChanges(): Observable<void> {
+    return new Observable<void>((observer) => {
+      const source = new EventSource(`${this.BASE}/events`);
+      source.onmessage = () => observer.next();
+      source.onerror = () => observer.error(new Error('SSE connection lost'));
+      return () => source.close();
+    });
   }
 }

@@ -28,6 +28,7 @@
               formControlName="title"
               placeholder="Título del post"
               class="w-full"
+              appAutoFocus
             />
             @if (form.get('title')?.invalid && form.get('title')?.touched) {
               <span class="text-xs text-red-500">El título debe tener al menos 3 caracteres</span>
