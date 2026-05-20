@@ -1,14 +1,11 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-3">
-  <h3 class="text-sm font-semibold text-slate-700">Agregar comentario</h3>
-  <textarea
-    pTextarea
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-3 p-4">
+  <p-editor
     formControlName="body"
+    [style]="{ height: '150px' }"
     placeholder="Escribe un comentario..."
-    rows="3"
-    class="w-full resize-none"
-  ></textarea>
+  />
   @if (form.get('body')?.invalid && form.get('body')?.touched) {
-    <span class="text-xs text-red-500">El comentario debe tener al menos 10 caracteres</span>
+    <span class="text-xs text-red-500">El comentario no puede estar vacío</span>
   }
   <div class="flex justify-end">
     <p-button

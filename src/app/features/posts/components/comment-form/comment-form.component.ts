@@ -1,15 +1,23 @@
 import { Component, inject, input, output, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { finalize, tap } from 'rxjs';
-import { Textarea } from 'primeng/textarea';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
+import { catchError, finalize, of, tap } from 'rxjs';
+import { EditorModule } from 'primeng/editor';
 import { Button } from 'primeng/button';
 import { CommentsService } from '../../services/comments.service';
 import { Comment } from '../../../../core/models/comment.model';
 
+function bodyValidator(): ValidatorFn {
+  return (control: AbstractControl) => {
+    const html = (control.value ?? '') as string;
+    const text = html.replace(/<[^>]*>/g, '').trim();
+    return text ? null : { required: true };
+  };
+}
+
 @Component({
   selector: 'app-comment-form',
   standalone: true,
-  imports: [ReactiveFormsModule, Textarea, Button],
+  imports: [ReactiveFormsModule, EditorModule, Button],
   templateUrl: './comment-form.component.html',
 })
 export class CommentFormComponent {
@@ -22,7 +30,7 @@ export class CommentFormComponent {
   saving = signal(false);
 
   form = this.fb.group({
-    body: ['', [Validators.required, Validators.minLength(10)]],
+    body: ['', [Validators.required, bodyValidator()]],
   });
 
   onSubmit(): void {
@@ -37,6 +45,7 @@ export class CommentFormComponent {
           this.form.reset();
         }),
         finalize(() => this.saving.set(false)),
+        catchError(() => of(null)),
       )
       .subscribe();
   }

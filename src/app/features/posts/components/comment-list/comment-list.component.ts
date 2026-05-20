@@ -18,6 +18,7 @@ export class CommentListComponent {
   private readonly confirmationService = inject(ConfirmationService);
 
   comments = input.required<Comment[]>();
+  currentUserId = input('');
   commentDeleted = output<string>();
 
   delete(id: string): void {
