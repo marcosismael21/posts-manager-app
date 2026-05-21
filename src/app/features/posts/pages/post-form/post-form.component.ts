@@ -14,11 +14,11 @@ import { Button } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { PostsService } from '../../services/posts.service';
 import { AutoFocusDirective } from '../../../../shared/directives/auto-focus.directive';
+import { stripHtml } from '../../../../core/utils/strip-html.util';
 
 function bodyValidator(min: number): ValidatorFn {
   return (control: AbstractControl) => {
-    const html = (control.value ?? '') as string;
-    const text = html.replace(/<[^>]*>/g, '').trim();
+    const text = stripHtml((control.value ?? '') as string);
     if (!text) return { required: true };
     if (text.length < min) return { minlength: true };
     return null;
