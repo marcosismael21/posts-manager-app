@@ -26,12 +26,13 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { Post } from '../../../../core/models/post.model';
 import { PostsTableComponent } from '../../components/posts-table/posts-table.component';
 import { PostsGridComponent } from '../../components/posts-grid/posts-grid.component';
+import { BulkUploadModalComponent } from '../../components/bulk-upload-modal/bulk-upload-modal.component';
 
 @Component({
   selector: 'app-my-posts',
   standalone: true,
   host: { class: 'flex flex-col flex-1 min-h-0' },
-  imports: [Button, InputText, ConfirmDialog, PostsTableComponent, PostsGridComponent],
+  imports: [Button, InputText, ConfirmDialog, PostsTableComponent, PostsGridComponent, BulkUploadModalComponent],
   providers: [ConfirmationService],
   templateUrl: './my-posts.component.html',
 })
@@ -47,7 +48,7 @@ export class MyPostsComponent implements OnInit, OnDestroy {
   posts = signal<Post[]>([]);
   loading = signal(false);
   totalRecords = signal(0);
-  bulkLoading = signal(false);
+  bulkModalVisible = signal(false);
   searchQuery = signal('');
   first = signal(0);
   view = signal<'table' | 'grid'>('table');
@@ -121,46 +122,14 @@ export class MyPostsComponent implements OnInit, OnDestroy {
     this.router.navigate(['/posts/new']);
   }
 
-  onBulkFile(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (!file) return;
+  openBulkModal(): void {
+    this.bulkModalVisible.set(true);
+  }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const dtos = JSON.parse(e.target?.result as string);
-        if (!Array.isArray(dtos)) throw new Error();
-
-        this.bulkLoading.set(true);
-        this.postsService
-          .bulkCreate(dtos)
-          .pipe(
-            tap(() => {
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Carga masiva',
-                detail: `${dtos.length} posts insertados`,
-                life: 3000,
-              });
-              this.first.set(0);
-              this.lastLazyEvent = undefined;
-              this.loadPosts();
-            }),
-            finalize(() => this.bulkLoading.set(false)),
-            catchError(() => of(null)),
-          )
-          .subscribe();
-      } catch {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'El archivo JSON no es válido',
-          life: 4000,
-        });
-      }
-    };
-    reader.readAsText(file);
-    (event.target as HTMLInputElement).value = '';
+  onBulkUploaded(): void {
+    this.first.set(0);
+    this.lastLazyEvent = undefined;
+    this.loadPosts();
   }
 
   viewPost(id: string): void {

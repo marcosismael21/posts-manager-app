@@ -1,0 +1,240 @@
+<p-dialog
+  [visible]="showCancelConfirm()"
+  [modal]="true"
+  [closable]="false"
+  [closeOnEscape]="false"
+  [dismissableMask]="false"
+  [style]="{ width: '400px' }"
+  header="¿Cerrar sin guardar?"
+>
+  <div class="flex flex-col gap-4 py-2">
+    <p class="text-sm text-slate-600">
+      Si cierras el modal perderás todos los cambios realizados. ¿Estás seguro?
+    </p>
+    <div class="flex justify-end gap-2">
+      <p-button label="Cancelar" severity="secondary" size="small" (onClick)="showCancelConfirm.set(false)" />
+      <p-button label="Sí, cerrar" severity="danger" size="small" (onClick)="closeClean()" />
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog
+  [visible]="showPartialConfirm()"
+  [modal]="true"
+  [closable]="false"
+  [closeOnEscape]="false"
+  [dismissableMask]="false"
+  [style]="{ width: '420px' }"
+  header="Posts sin confirmar"
+  
+>
+  <div class="flex flex-col gap-4 py-2">
+    <p class="text-sm text-slate-600">
+      <strong>{{ total() - confirmedCount() }}</strong>
+      post{{ (total() - confirmedCount()) !== 1 ? 's' : '' }}
+      no {{ (total() - confirmedCount()) !== 1 ? 'serán subidos' : 'será subido' }}.
+      ¿Continuar de todos modos?
+    </p>
+    <div class="flex justify-end gap-2">
+      <p-button label="Cancelar" severity="secondary" size="small" (onClick)="showPartialConfirm.set(false)" />
+      <p-button label="Sí, subir" size="small" (onClick)="doUpload()" />
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog
+  [visible]="visible()"
+  [modal]="true"
+  [closable]="false"
+  [closeOnEscape]="false"
+  [dismissableMask]="false"
+  [style]="{ width: '90vw', maxWidth: '1200px' }"
+  header="Carga masiva de posts"
+>
+
+  @if (step() === 'import') {
+    <div class="flex flex-col gap-6">
+      <div class="flex flex-col items-center justify-center gap-8 py-12">
+        <div class="text-center max-w-md">
+          <i class="pi pi-upload text-5xl text-slate-300 mb-4 block"></i>
+          <h3 class="text-lg font-semibold text-slate-700 mb-2">Importar posts desde JSON</h3>
+          <p class="text-sm text-slate-500">
+            Descarga la plantilla, edítala con los datos de tus posts y súbela para
+            revisarlos y editarlos antes de publicar.
+          </p>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <p-button
+            label="Descargar plantilla"
+            icon="pi pi-download"
+            severity="secondary"
+            (onClick)="downloadTemplate()"
+          />
+          <label
+            for="jsonInput"
+            class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 text-sm rounded font-medium transition-colors
+                   bg-blue-600 text-white hover:bg-blue-700"
+          >
+            <i class="pi pi-file-import"></i>
+            Importar JSON
+          </label>
+          <input id="jsonInput" type="file" accept=".json" class="hidden" (change)="onJsonFile($event)" />
+        </div>
+      </div>
+
+      <div class="border-t border-slate-100 pt-4 flex justify-end">
+        <p-button label="Cancelar" severity="secondary" (onClick)="requestClose()" />
+      </div>
+    </div>
+  }
+
+  @if (step() === 'review') {
+    <div class="flex flex-col gap-4">
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <p-button
+            icon="pi pi-chevron-left"
+            label="Anterior"
+            severity="secondary"
+            size="small"
+            [text]="true"
+            [disabled]="currentIndex() === 0"
+            (onClick)="prev()"
+          />
+          <span class="text-sm font-medium text-slate-600 px-2">
+            Post <strong>{{ currentIndex() + 1 }}</strong> de <strong>{{ total() }}</strong>
+          </span>
+          <p-button
+            label="Siguiente"
+            icon="pi pi-chevron-right"
+            iconPos="right"
+            severity="secondary"
+            size="small"
+            [text]="true"
+            [disabled]="currentIndex() === total() - 1"
+            (onClick)="next()"
+          />
+        </div>
+
+        @if (currentDraft(); as draft) {
+          <p-button
+            [icon]="draft.confirmed ? 'pi pi-check-circle' : 'pi pi-circle'"
+            [label]="draft.confirmed ? 'Confirmado' : 'Confirmar post'"
+            [severity]="draft.confirmed ? 'success' : 'secondary'"
+            size="small"
+            (onClick)="toggleConfirm()"
+          />
+        }
+      </div>
+
+      @if (currentDraft(); as draft) {
+        <form [formGroup]="draftForm" class="flex gap-6">
+
+          <div
+            class="w-1/2 flex flex-col gap-4 bg-white border rounded-sm p-5 transition-all duration-200"
+            [class]="draft.confirmed ? 'border-green-400 ring-2 ring-green-200' : 'border-slate-200'"
+          >
+            <div class="flex flex-col gap-1.5">
+              <label for="draftTitle" class="text-sm font-medium text-slate-700">
+                Título <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="draftTitle"
+                type="text"
+                pInputText
+                formControlName="title"
+                placeholder="Título del post"
+                class="w-full"
+              />
+              @if (draftForm.get('title')?.invalid && draftForm.get('title')?.touched) {
+                <span class="text-xs text-red-500">El título debe tener al menos 3 caracteres</span>
+              }
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label class="text-sm font-medium text-slate-700">
+                Contenido <span class="text-red-500">*</span>
+              </label>
+              <p-editor
+                formControlName="body"
+                [style]="{ height: '260px' }"
+                placeholder="Escribe el contenido del post..."
+              />
+              @if (draftForm.get('body')?.invalid && draftForm.get('body')?.touched) {
+                <span class="text-xs text-red-500">El contenido debe tener al menos 10 caracteres</span>
+              }
+            </div>
+          </div>
+
+          <div class="w-1/2 flex flex-col gap-3 bg-white border border-slate-200 rounded-sm p-4">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium text-slate-700">Imágenes</span>
+              <span class="text-xs text-slate-400">{{ draft.pendingFiles.length }}/10</span>
+            </div>
+
+            @if (draft.previewUrls.length) {
+              <div class="flex flex-wrap gap-2">
+                @for (url of draft.previewUrls; track url; let i = $index) {
+                  <div class="relative">
+                    <img [src]="url" class="h-20 w-20 object-cover rounded border border-slate-200" />
+                    <button
+                      type="button"
+                      (click)="removeImage(i)"
+                      class="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center transition-colors"
+                    >
+                      <i class="pi pi-times" style="font-size: 0.55rem"></i>
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+
+            @if (remainingSlots() > 0) {
+              <label
+                [for]="'imgInput_' + currentIndex()"
+                class="cursor-pointer flex flex-col items-center justify-center gap-1.5 py-5 text-sm border-2 border-dashed
+                       border-slate-200 text-slate-400 rounded hover:bg-slate-50 hover:border-slate-300 hover:text-slate-500 transition-colors"
+              >
+                <i class="pi pi-cloud-upload text-2xl"></i>
+                <span>Agregar imágenes</span>
+              </label>
+              <input
+                [id]="'imgInput_' + currentIndex()"
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/svg+xml"
+                multiple
+                class="hidden"
+                (change)="onImageFiles($event)"
+              />
+            }
+
+            <p class="text-xs text-slate-400 mt-auto">Máx. 10 imágenes · 6 MB · JPG, PNG, GIF, WebP, SVG</p>
+          </div>
+
+        </form>
+      }
+
+      <div class="border-t border-slate-100 pt-4 flex items-center justify-between">
+        <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="requestClose()" />
+        <div class="flex items-center gap-4">
+          <span class="text-sm text-slate-500">
+            <span [class]="confirmedCount() > 0 ? 'font-semibold text-green-600' : ''">
+              {{ confirmedCount() }}
+            </span>
+            / {{ total() }} confirmados
+          </span>
+          <p-button
+            label="Subir posts confirmados"
+            icon="pi pi-cloud-upload"
+            [disabled]="confirmedCount() === 0 || uploading()"
+            [loading]="uploading()"
+            (onClick)="requestUpload()"
+          />
+        </div>
+      </div>
+
+    </div>
+  }
+
+</p-dialog>

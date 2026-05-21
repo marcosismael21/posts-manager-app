@@ -5,34 +5,37 @@
   <div class="flex-shrink-0 flex items-center justify-between">
     <h1 class="text-xl font-semibold text-slate-800">Mis posts</h1>
     <div class="flex items-center gap-2">
-      <div class="flex items-center gap-1 border border-slate-200 rounded p-0.5 bg-white">
-        <p-button
-          icon="pi pi-list"
-          severity="secondary"
-          size="small"
-          [text]="view() !== 'table'"
-          (onClick)="view.set('table')"
-          pTooltip="Vista tabla"
-        />
-        <p-button
-          icon="pi pi-th-large"
-          severity="secondary"
-          size="small"
-          [text]="view() !== 'grid'"
-          (onClick)="view.set('grid')"
-          pTooltip="Vista mosaico"
-        />
-      </div>
-      <label
-        for="bulkInput"
-        class="cursor-pointer inline-flex items-center gap-2 px-3 py-2 text-sm border border-slate-300 text-slate-600 rounded hover:bg-slate-50 transition-colors"
-        [class.opacity-50]="bulkLoading()"
-      >
-        <i class="pi pi-upload text-xs"></i>
-        <span>{{ bulkLoading() ? 'Cargando...' : 'Carga masiva' }}</span>
-      </label>
-      <input id="bulkInput" type="file" accept=".json" class="hidden" (change)="onBulkFile($event)" />
-      <p-button label="Nuevo post" icon="pi pi-plus" size="small" (onClick)="newPost()" />
+      <p-button
+        label="Modo lista"
+        icon="pi pi-list"
+        size="small"
+        [severity]="view() === 'table' ? 'secondary' : 'secondary'"
+        [outlined]="view() !== 'table'"
+        (onClick)="view.set('table')"
+      />
+      <p-button
+        label="Modo mosaico"
+        icon="pi pi-th-large"
+        size="small"
+        [severity]="view() === 'grid' ? 'secondary' : 'secondary'"
+        [outlined]="view() !== 'grid'"
+        (onClick)="view.set('grid')"
+      />
+      <span class="w-px h-6 bg-slate-500 mx-1"></span>
+      <p-button
+        label="Carga masiva"
+        icon="pi pi-upload"
+        severity="secondary"
+        size="small"
+        [outlined]="true"
+        (onClick)="openBulkModal()"
+      />
+      <p-button
+        label="Nuevo post"
+        icon="pi pi-plus"
+        size="small"
+        (onClick)="newPost()"
+      />
     </div>
   </div>
 
@@ -72,3 +75,9 @@
   }
 
 </div>
+
+<app-bulk-upload-modal
+  [visible]="bulkModalVisible()"
+  (closed)="bulkModalVisible.set(false)"
+  (uploaded)="onBulkUploaded()"
+/>
