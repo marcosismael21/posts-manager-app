@@ -1,22 +1,22 @@
 <div class="flex flex-col flex-1 min-h-0 p-6 gap-4">
   <div class="flex items-center justify-between flex-shrink-0">
     <h1 class="text-xl font-semibold text-slate-800">Posts</h1>
-    <div class="flex items-center gap-1 border border-slate-200 rounded p-0.5 bg-white">
+    <div class="flex items-center gap-2">
       <p-button
+        label="Modo lista"
         icon="pi pi-list"
         severity="secondary"
         size="small"
-        [text]="view() !== 'table'"
+        [outlined]="view() !== 'table'"
         (onClick)="view.set('table')"
-        pTooltip="Vista tabla"
       />
       <p-button
+        label="Modo mosaico"
         icon="pi pi-th-large"
         severity="secondary"
         size="small"
-        [text]="view() !== 'grid'"
+        [outlined]="view() !== 'grid'"
         (onClick)="view.set('grid')"
-        pTooltip="Vista mosaico"
       />
     </div>
   </div>
