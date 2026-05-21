@@ -49,6 +49,13 @@ export const routes: Routes = [
             (m) => m.MyPostsComponent,
           ),
       },
+      {
+        path: 'users',
+        loadComponent: () =>
+          import('./features/users/pages/users/users.component').then(
+            (m) => m.UsersComponent,
+          ),
+      },
     ],
   },
   { path: '**', redirectTo: 'posts' },
