@@ -1,59 +1,78 @@
-# PostsManagerApp
+# Posts Manager — Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.11.
+Aplicación web para gestión de posts y comentarios. Construida con Angular 21, PrimeNG y Tailwind CSS.
 
-## Development server
+## Tecnologías
 
-To start a local development server, run:
+- **Angular 21** — framework frontend con signals y standalone components
+- **PrimeNG** — componentes UI (tablas, diálogos, formularios, editor)
+- **Tailwind CSS** — estilos utilitarios
+- **RxJS** — manejo de flujos asíncronos
+- **JWT** — autenticación con interceptores HTTP
 
-```bash
-ng serve
-```
+## Requisitos previos
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Node.js 18 o superior
+- npm
+- Backend levantado y corriendo en `http://localhost:3000`
 
-## Code scaffolding
+## Instalación
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### 1. Clonar el repositorio
 
 ```bash
-ng generate --help
+git clone <url-del-repositorio>
+cd posts-manager-app
 ```
 
-## Building
-
-To build the project run:
+### 2. Instalar dependencias
 
 ```bash
-ng build
+npm install
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### 3. Configurar variables de entorno
 
-## Running unit tests
+Ajusta el archivo `src/environments/environment.ts` si el backend corre en un puerto distinto:
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+```typescript
+export const environment = {
+  apiUrl: 'http://localhost:3000'
+};
+```
+
+### 4. Ejecutar la aplicación
 
 ```bash
-ng test
+npm run start
 ```
 
-## Running end-to-end tests
+La aplicación queda disponible en `http://localhost:4200`.
 
-For end-to-end (e2e) testing, run:
+## Credenciales de prueba
+
+Utiliza cualquier usuario del seed del backend. Ejemplo:
+
+```json
+{
+  "email": "juanperez@example.com",
+  "password": "12345"
+}
+```
+
+## Funcionalidades
+
+| Módulo | Descripción |
+|--------|-------------|
+| **Login** | Autenticación con JWT, guard de rutas protegidas |
+| **Posts** | Listado con búsqueda, paginación, vista tabla y mosaico |
+| **Mis posts** | Posts propios con crear, editar, eliminar y carga masiva desde JSON |
+| **Detalle del post** | Vista completa con carrusel de imágenes y sección de comentarios |
+| **Usuarios** | CRUD completo de usuarios con búsqueda |
+
+## Scripts disponibles
 
 ```bash
-ng e2e
+npm run start          # Desarrollo con hot-reload
+npm run build      # Compilar para producción
 ```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
