@@ -3,17 +3,19 @@
 @if (comments().length === 0) {
   <p class="text-sm text-slate-400 py-8 text-center">Sin comentarios aún</p>
 } @else {
-  <div class="flex flex-col divide-y divide-slate-100">
+  <div class="flex flex-col gap-3 p-4">
     @for (comment of comments(); track comment._id) {
-      <div class="px-4 py-3 flex items-start justify-between gap-4">
+      <div class="bg-slate-50 border border-slate-200 rounded p-3 flex items-start justify-between gap-3">
         <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-sm font-medium text-slate-800">{{ comment.name }}</span>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="w-7 h-7 rounded-full bg-slate-300 text-slate-700 text-xs font-bold flex items-center justify-center shrink-0">
+              {{ comment.name.charAt(0).toUpperCase() }}
+            </span>
+            <span class="text-sm font-semibold text-slate-800">{{ comment.name }}</span>
             <span class="text-xs text-slate-400">{{ comment.email }}</span>
-            <span class="text-xs text-slate-300">·</span>
-            <span class="text-xs text-slate-400">{{ comment.createdAt }}</span>
+            <span class="text-xs text-slate-300 ml-auto">{{ comment.createdAt }}</span>
           </div>
-          <div class="text-sm text-slate-600 ql-editor !p-0 !min-h-0" [innerHTML]="comment.body"></div>
+          <div class="text-sm text-slate-600 ql-editor !p-0 !min-h-0 pl-9" [innerHTML]="comment.body"></div>
         </div>
         @if (comment.userId === currentUserId()) {
           <p-button
