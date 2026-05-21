@@ -1,0 +1,78 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="$event ? null : closed.emit()"
+  [modal]="true"
+  [style]="{ width: '440px' }"
+  [header]="isEditMode ? 'Editar usuario' : 'Nuevo usuario'"
+>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4 py-2">
+    <div class="flex flex-col gap-1.5">
+      <label for="userName" class="text-sm font-medium text-slate-700">
+        Nombre <span class="text-red-500">*</span>
+      </label>
+      <input
+        id="userName"
+        type="text"
+        pInputText
+        formControlName="name"
+        placeholder="Nombre completo"
+        class="w-full"
+      />
+      @if (form.get('name')?.invalid && form.get('name')?.touched) {
+        <span class="text-xs text-red-500">El nombre es requerido</span>
+      }
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="userEmail" class="text-sm font-medium text-slate-700">
+        Email <span class="text-red-500">*</span>
+      </label>
+      <input
+        id="userEmail"
+        type="email"
+        pInputText
+        formControlName="email"
+        placeholder="correo@ejemplo.com"
+        class="w-full"
+      />
+      @if (form.get('email')?.invalid && form.get('email')?.touched) {
+        <span class="text-xs text-red-500">Ingresa un email válido</span>
+      }
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="userPassword" class="text-sm font-medium text-slate-700">
+        {{ isEditMode ? 'Nueva contraseña' : 'Contraseña' }}
+        <span class="text-red-500">*</span>
+      </label>
+      <p-password
+        formControlName="password"
+        [toggleMask]="true"
+        [feedback]="false"
+        placeholder="Mínimo 6 caracteres"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+      />
+      @if (form.get('password')?.invalid && form.get('password')?.touched) {
+        <span class="text-xs text-red-500">La contraseña debe tener al menos 6 caracteres</span>
+      }
+    </div>
+
+    <div class="flex justify-end gap-2 border-t border-slate-100 pt-4">
+      <p-button
+        type="button"
+        label="Cancelar"
+        severity="secondary"
+        size="small"
+        (onClick)="closed.emit()"
+      />
+      <p-button
+        type="submit"
+        [label]="isEditMode ? 'Guardar cambios' : 'Crear usuario'"
+        size="small"
+        [loading]="saving()"
+        [disabled]="form.invalid"
+      />
+    </div>
+  </form>
+</p-dialog>

@@ -1,0 +1,97 @@
+<p-confirmDialog />
+
+<div class="flex flex-col flex-1 min-h-0 p-6 gap-4">
+
+  <div class="flex-shrink-0 flex items-center justify-between">
+    <h1 class="text-xl font-semibold text-slate-800">Usuarios</h1>
+    <p-button label="Nuevo usuario" icon="pi pi-plus" size="small" (onClick)="openCreate()" />
+  </div>
+
+  <div class="flex-shrink-0">
+    <input
+      pInputText
+      type="text"
+      placeholder="Buscar por nombre o email..."
+      class="w-full max-w-sm"
+      (input)="onSearch($any($event.target).value)"
+    />
+  </div>
+
+  <div class="flex-1 min-h-0 bg-white border border-slate-200 rounded-sm overflow-hidden">
+    <p-table
+      [value]="users()"
+      [loading]="loading()"
+      [scrollable]="true"
+      scrollHeight="flex"
+      styleClass="p-datatable-sm"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="text-left" style="width: 35%">Nombre</th>
+          <th class="text-left" style="width: 35%">Email</th>
+          <th class="text-left" style="width: 15%">Registro</th>
+          <th class="text-left" style="width: 15%">Acciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-user>
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td>
+            <span class="font-medium text-slate-800">{{ user.name }}</span>
+          </td>
+          <td class="text-slate-500 text-sm">{{ user.email }}</td>
+          <td class="text-slate-400 text-sm">{{ user.createdAt }}</td>
+          <td>
+            <div class="flex items-center gap-1">
+              <p-button
+                icon="pi pi-eye"
+                size="small"
+                severity="secondary"
+                [text]="true"
+                pTooltip="Ver detalle"
+                (onClick)="openDetail(user)"
+              />
+              <p-button
+                icon="pi pi-pencil"
+                size="small"
+                severity="secondary"
+                [text]="true"
+                pTooltip="Editar"
+                (onClick)="openEdit(user)"
+              />
+              <p-button
+                icon="pi pi-trash"
+                size="small"
+                severity="danger"
+                [text]="true"
+                pTooltip="Eliminar"
+                (onClick)="confirmDelete(user)"
+              />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4" class="text-center text-slate-400 py-10 text-sm">No hay usuarios registrados</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+</div>
+
+<app-user-detail-modal
+  [visible]="detailVisible()"
+  [user]="selectedUser()"
+  (closed)="detailVisible.set(false)"
+  (edit)="openEditFromDetail()"
+/>
+
+<app-user-form-modal
+  [visible]="formVisible()"
+  [user]="selectedUser()"
+  (closed)="formVisible.set(false)"
+  (saved)="onSaved($event)"
+/>
