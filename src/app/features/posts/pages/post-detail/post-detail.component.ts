@@ -29,6 +29,7 @@ export class PostDetailComponent implements OnInit {
   comments = signal<Comment[]>([]);
   loading = signal(true);
   readonly currentUserId = this.authService.getCurrentUser()?.id ?? '';
+  imageIndex = 0;
 
   ngOnInit(): void {
     this.route.params
@@ -41,6 +42,7 @@ export class PostDetailComponent implements OnInit {
             tap(([post, comments]) => {
               this.post.set(post);
               this.comments.set(comments);
+              this.imageIndex = 0;
             }),
             finalize(() => this.loading.set(false)),
             catchError(() => of(null)),
@@ -48,6 +50,16 @@ export class PostDetailComponent implements OnInit {
         ),
       )
       .subscribe();
+  }
+
+  prevImage(): void {
+    const total = this.post()!.imageUrls.length;
+    this.imageIndex = (this.imageIndex - 1 + total) % total;
+  }
+
+  nextImage(): void {
+    const total = this.post()!.imageUrls.length;
+    this.imageIndex = (this.imageIndex + 1) % total;
   }
 
   goBack(): void {

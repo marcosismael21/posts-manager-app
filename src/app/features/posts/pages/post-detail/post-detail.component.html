@@ -18,7 +18,9 @@
 
           <div class="flex items-start justify-between gap-4 mb-3">
             <h2 class="text-xl font-semibold text-slate-800">{{ post()!.title }}</h2>
-            <p-button icon="pi pi-pencil" label="Editar" size="small" severity="secondary" (onClick)="editPost()" />
+            @if (post()!.userId === currentUserId) {
+              <p-button icon="pi pi-pencil" label="Editar" size="small" severity="secondary" (onClick)="editPost()" />
+            }
           </div>
 
           <div class="flex items-center gap-4 text-xs text-slate-400 mb-6">
@@ -32,9 +34,42 @@
           <div class="text-slate-700 leading-relaxed ql-editor" [innerHTML]="post()!.body"></div>
 
           @if (post()!.imageUrls.length) {
-            <div class="flex flex-wrap gap-3 mt-6">
-              @for (url of post()!.imageUrls; track url) {
-                <img [src]="url" [alt]="post()!.title" class="h-52 w-52 object-cover rounded border border-slate-200" />
+            <div class="relative mt-6 rounded overflow-hidden bg-slate-100 aspect-video">
+              <img
+                [src]="post()!.imageUrls[imageIndex]"
+                [alt]="post()!.title"
+                class="w-full h-full object-cover"
+              />
+
+              @if (post()!.imageUrls.length > 1) {
+                <button
+                  type="button"
+                  (click)="prevImage()"
+                  class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-colors"
+                >
+                  <i class="pi pi-chevron-left"></i>
+                </button>
+                <button
+                  type="button"
+                  (click)="nextImage()"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-colors"
+                >
+                  <i class="pi pi-chevron-right"></i>
+                </button>
+
+                <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                  @for (url of post()!.imageUrls; track url; let i = $index) {
+                    <span
+                      class="w-2 h-2 rounded-full transition-colors cursor-pointer"
+                      [class]="i === imageIndex ? 'bg-white' : 'bg-white/40'"
+                      (click)="imageIndex = i"
+                    ></span>
+                  }
+                </div>
+
+                <span class="absolute top-3 right-3 text-xs text-white bg-black/40 rounded px-2 py-0.5">
+                  {{ imageIndex + 1 }} / {{ post()!.imageUrls.length }}
+                </span>
               }
             </div>
           }
