@@ -14,7 +14,7 @@
         @for (post of posts(); track post._id) {
           <div class="bg-white border border-slate-200 rounded-sm flex flex-col overflow-hidden">
 
-            @if (post.imageUrls?.length) {
+            @if (post.imageUrls.length) {
               <div class="relative aspect-[4/3] bg-slate-100 flex-shrink-0">
                 <img
                   [src]="post.imageUrls[getIndex(post._id)]"

@@ -1,6 +1,5 @@
 import { Component, input, output, signal } from '@angular/core';
 import { Button } from 'primeng/button';
-import { Tag } from 'primeng/tag';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { TooltipModule } from 'primeng/tooltip';
 import { Post } from '../../../../core/models/post.model';
@@ -10,7 +9,7 @@ import { EmptyStateComponent } from '../../../../shared/components/empty-state/e
   selector: 'app-posts-grid',
   standalone: true,
   host: { class: 'flex flex-col flex-1 min-h-0' },
-  imports: [Button, Tag, Paginator, TooltipModule, EmptyStateComponent],
+  imports: [Button, Paginator, TooltipModule, EmptyStateComponent],
   templateUrl: './posts-grid.component.html',
 })
 export class PostsGridComponent {

@@ -2,7 +2,6 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, combineLatest, finalize, of, switchMap, tap } from 'rxjs';
 import { Button } from 'primeng/button';
-import { Divider } from 'primeng/divider';
 import { PostsService } from '../../services/posts.service';
 import { CommentsService } from '../../services/comments.service';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -15,7 +14,7 @@ import { CommentListComponent } from '../../components/comment-list/comment-list
   selector: 'app-post-detail',
   standalone: true,
   host: { class: 'flex flex-col flex-1 min-h-0' },
-  imports: [Button, Divider, CommentFormComponent, CommentListComponent],
+  imports: [Button, CommentFormComponent, CommentListComponent],
   templateUrl: './post-detail.component.html',
 })
 export class PostDetailComponent implements OnInit {
